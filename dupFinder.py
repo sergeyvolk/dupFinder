@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 import collections, hashlib, os, sys
 
 
@@ -28,11 +27,17 @@ def file_md5(filename):
 def findDups(fileSizeDict):
     # dict: (file size, dict: (md5, filenames))
     result = {}
+    totalFilesToHash = 0
+    for val in fileSizeDict.values():
+        if len(val) > 1:
+            totalFilesToHash += len(val)
+    i = 0
     for size, files in fileSizeDict.items():
         if len(files) > 1:
             hashes = collections.defaultdict(list)
             for f in files:
-                print('Hashing: ', f)
+                i += 1
+                print('Hashing ', i, '/', totalFilesToHash, ': ', f)
                 md5 = file_md5(f)
                 hashes[md5].append(f)
             for md5, dups in hashes.items():
@@ -47,6 +52,7 @@ if __name__ == '__main__':
         fileDups = findDups(fileSizeDict)
         #print(fileDups)
         if fileDups:
+            print()
             print('Duplicates:')
             for size, dups in sorted(fileDups.items()):
                 print('Size: ', size)
